@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude 3.5 Code Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://cdn.oaistatic.com/_next/static/media/claude-favicon-32x32.be1c4ad7.png" alt="Claude Icon" class="claude-icon">
+                <h1>Claude 3.5 Code Generator</h1>
+            </div>
+            <div class="api-section">
+                <input type="password" id="apiKeyInput" placeholder="Enter your Claude API key" />
+                <div class="api-info">
+                    <span class="api-status" id="apiStatus">⚪ Not Connected</span>
+                    <button id="connectButton">Connect</button>
+                </div>
+            </div>
+            <div class="prompt-section">
+                <textarea id="promptInput" placeholder="What would you like me to create? I can generate any UI component, animation, or functionality you need." disabled></textarea>
+                <button id="generateButton" disabled>Generate Code</button>
+            </div>
+            <div class="file-list" id="fileList">
+                <div class="file active" data-file="index.html">index.html</div>
+                <div class="file" data-file="styles.css">styles.css</div>
+                <div class="file" data-file="script.js">script.js</div>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="code-section">
+                <div class="code-header">
+                    <span class="current-file">index.html</span>
+                    <button class="copy-button" id="copyButton">Copy Code</button>
+                </div>
+                <pre><code class="language-html" id="codeDisplay"></code></pre>
+            </div>
+            <div class="preview-section">
+                <div class="preview-header">
+                    <span>Live Preview</span>
+                    <button class="refresh-button" id="refreshButton">Refresh Preview</button>
+                </div>
+                <iframe id="previewFrame" src="about:blank"></iframe>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
