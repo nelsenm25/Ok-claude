@@ -274,7 +274,7 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        // Create particle system
+        // Particle System
         const particlesGeometry = new THREE.BufferGeometry();
         const particlesCount = 5000;
         const posArray = new Float32Array(particlesCount * 3);
@@ -295,7 +295,7 @@
         const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
         scene.add(particlesMesh);
 
-        // Add 3D geometric shapes
+        // Purple Torus
         const torus = new THREE.Mesh(
             new THREE.TorusGeometry(3, 0.8, 16, 100),
             new THREE.MeshPhongMaterial({
@@ -307,19 +307,7 @@
         );
         scene.add(torus);
 
-        const octahedron = new THREE.Mesh(
-            new THREE.OctahedronGeometry(2),
-            new THREE.MeshStandardMaterial({
-                color: 0x00ffff,
-                wireframe: true,
-                transparent: true,
-                opacity: 0.2
-            })
-        );
-        octahedron.position.x = 5;
-        scene.add(octahedron);
-
-        // Lighting setup
+        // Lighting
         const ambientLight = new THREE.AmbientLight(0x404040);
         scene.add(ambientLight);
         
@@ -329,31 +317,31 @@
 
         camera.position.z = 7;
 
-        // Animation loop
+        // Animation Loop
         function animate() {
             requestAnimationFrame(animate);
             
+            // Automatic rotations
             particlesMesh.rotation.y += 0.001;
             particlesMesh.rotation.x += 0.001;
             torus.rotation.x += 0.01;
             torus.rotation.y += 0.015;
-            octahedron.rotation.z += 0.02;
             
-            // Dynamic lighting effects
+            // Dynamic lighting
             pointLight.intensity = Math.sin(Date.now() * 0.002) * 0.5 + 0.5;
             
             renderer.render(scene, camera);
         }
         animate();
 
-        // Window resize handler
+        // Window Resize Handler
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // Smooth scroll functionality
+        // Smooth Scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -363,20 +351,7 @@
             });
         });
 
-        // Interactive mouse effects
-        document.addEventListener('mousemove', (e) => {
-            const x = (e.clientX - window.innerWidth/2) * 0.0003;
-            const y = (e.clientY - window.innerHeight/2) * 0.0003;
-            
-            torus.rotation.x = y * 3;
-            torus.rotation.y = x * 3;
-            octahedron.rotation.x = x * 2;
-            octahedron.rotation.y = y * 2;
-            particlesMesh.rotation.y = x;
-            particlesMesh.rotation.x = y;
-        });
-
-        // Form submission handling
+        // Form Handling
         const form = document.getElementById('contact-form');
         const successMessage = document.getElementById('success-message');
         const errorMessage = document.getElementById('error-message');
