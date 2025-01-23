@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -174,6 +175,24 @@
             transform: scale(1.05);
         }
 
+        .form-message {
+            display: none;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .success {
+            background: rgba(0, 255, 140, 0.1);
+            color: var(--primary);
+        }
+
+        .error {
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff0000;
+        }
+
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-20px); }
@@ -237,12 +256,14 @@
 
     <section id="contact" class="section">
         <h2>Contact Us</h2>
-        <form class="contact-form">
-            <input type="text" placeholder="Name" required>
-            <input type="email" placeholder="Email" required>
-            <textarea placeholder="Message" rows="5" required></textarea>
+        <form class="contact-form" action="https://formspree.io/f/xqaekwge" method="POST" id="contact-form">
+            <input type="text" name="name" placeholder="Name" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <textarea name="message" placeholder="Message" rows="5" required></textarea>
             <button type="submit">Send Message</button>
         </form>
+        <div class="form-message success" id="success-message">Message sent successfully! 🎉</div>
+        <div class="form-message error" id="error-message">Failed to send message. Please try again.</div>
     </section>
 
     <script>
@@ -253,45 +274,86 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        // Create particles
+        // Create particle system
         const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 1000;
+        const particlesCount = 5000;
         const posArray = new Float32Array(particlesCount * 3);
 
         for(let i = 0; i < particlesCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 5;
+            posArray[i] = (Math.random() - 0.5) * 15;
         }
 
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
 
         const particlesMaterial = new THREE.PointsMaterial({
-            size: 0.005,
-            color: 0x00ff8c
+            size: 0.002,
+            color: 0x00ff8c,
+            transparent: true,
+            opacity: 0.7
         });
 
         const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
         scene.add(particlesMesh);
 
-        // Camera position
-        camera.position.z = 3;
+        // Add 3D geometric shapes
+        const torus = new THREE.Mesh(
+            new THREE.TorusGeometry(3, 0.8, 16, 100),
+            new THREE.MeshPhongMaterial({
+                color: 0xff00ff,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.2
+            })
+        );
+        scene.add(torus);
 
-        // Animation
+        const octahedron = new THREE.Mesh(
+            new THREE.OctahedronGeometry(2),
+            new THREE.MeshStandardMaterial({
+                color: 0x00ffff,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.2
+            })
+        );
+        octahedron.position.x = 5;
+        scene.add(octahedron);
+
+        // Lighting setup
+        const ambientLight = new THREE.AmbientLight(0x404040);
+        scene.add(ambientLight);
+        
+        const pointLight = new THREE.PointLight(0x00ff8c, 1, 100);
+        pointLight.position.set(0, 0, 5);
+        scene.add(pointLight);
+
+        camera.position.z = 7;
+
+        // Animation loop
         function animate() {
             requestAnimationFrame(animate);
+            
             particlesMesh.rotation.y += 0.001;
             particlesMesh.rotation.x += 0.001;
+            torus.rotation.x += 0.01;
+            torus.rotation.y += 0.015;
+            octahedron.rotation.z += 0.02;
+            
+            // Dynamic lighting effects
+            pointLight.intensity = Math.sin(Date.now() * 0.002) * 0.5 + 0.5;
+            
             renderer.render(scene, camera);
         }
         animate();
 
-        // Handle window resize
+        // Window resize handler
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // Smooth scroll
+        // Smooth scroll functionality
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -301,13 +363,52 @@
             });
         });
 
-        // Parallax effect
+        // Interactive mouse effects
         document.addEventListener('mousemove', (e) => {
-            const x = e.clientX / window.innerWidth;
-            const y = e.clientY / window.innerHeight;
+            const x = (e.clientX - window.innerWidth/2) * 0.0003;
+            const y = (e.clientY - window.innerHeight/2) * 0.0003;
             
-            particlesMesh.rotation.y = x * 0.5;
-            particlesMesh.rotation.x = y * 0.5;
+            torus.rotation.x = y * 3;
+            torus.rotation.y = x * 3;
+            octahedron.rotation.x = x * 2;
+            octahedron.rotation.y = y * 2;
+            particlesMesh.rotation.y = x;
+            particlesMesh.rotation.x = y;
+        });
+
+        // Form submission handling
+        const form = document.getElementById('contact-form');
+        const successMessage = document.getElementById('success-message');
+        const errorMessage = document.getElementById('error-message');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    successMessage.style.display = 'block';
+                    errorMessage.style.display = 'none';
+                    form.reset();
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                    }, 3000);
+                } else {
+                    errorMessage.style.display = 'block';
+                    successMessage.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+            }
         });
     </script>
 </body>
